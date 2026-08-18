@@ -29,3 +29,4 @@ commit。
 GitHub 托管 runner 尚无 `ubuntu-26.04` runner 标签，因此工作流在
 `ubuntu-24.04` runner 上启动官方 `ubuntu:26.04` 容器，所有依赖、CUDA 工具链和
 llama.cpp 都在该容器内安装及编译。CUDA 来自 NVIDIA 的 Ubuntu 24.04 软件源。
+安装脚本会将版本化 CUDA 目录写入 Actions 环境，供后续 CMake 构建使用。

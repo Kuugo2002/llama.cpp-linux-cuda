@@ -21,4 +21,30 @@ dpkg -i /tmp/cuda-keyring.deb
 apt-get update
 apt-get install -y --no-install-recommends "${cuda_package}"
 
-nvcc --version
+cuda_home="/usr/local/cuda-${CUDA_VERSION}"
+nvcc_path="${cuda_home}/bin/nvcc"
+
+if [[ ! -x "${nvcc_path}" ]]; then
+  nvcc_path="$(find /usr/local -type f -path '*/bin/nvcc' -print -quit)"
+  if [[ -z "${nvcc_path}" ]]; then
+    echo "CUDA package was installed, but nvcc could not be found under /usr/local." >&2
+    exit 1
+  fi
+  cuda_home="${nvcc_path%/bin/nvcc}"
+fi
+
+export CUDA_HOME="${cuda_home}"
+export CUDACXX="${nvcc_path}"
+export PATH="${cuda_home}/bin:${PATH}"
+
+if [[ -n "${GITHUB_PATH:-}" ]]; then
+  echo "${cuda_home}/bin" >> "${GITHUB_PATH}"
+fi
+if [[ -n "${GITHUB_ENV:-}" ]]; then
+  {
+    echo "CUDA_HOME=${cuda_home}"
+    echo "CUDACXX=${nvcc_path}"
+  } >> "${GITHUB_ENV}"
+fi
+
+"${nvcc_path}" --version
