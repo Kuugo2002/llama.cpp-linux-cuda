@@ -20,6 +20,7 @@ cmake -S "${source_dir}" -B "${build_dir}" -G Ninja \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX=/usr \
   -DGGML_CUDA=ON \
+  -DGGML_NATIVE=OFF \
   -DLLAMA_CURL=OFF \
   -DLLAMA_BUILD_TESTS=OFF \
   -DLLAMA_BUILD_EXAMPLES=ON \

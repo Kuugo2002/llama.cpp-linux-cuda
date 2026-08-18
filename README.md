@@ -24,6 +24,10 @@ commit。
 元数据、许可证和构建信息。解压到任意目录后，如不安装到系统路径，需要把其中的
 `usr/lib` 加入 `LD_LIBRARY_PATH`。
 
+构建时关闭 `GGML_NATIVE`，避免无 GPU 的 GitHub Actions 容器尝试使用
+`-arch=native`；CUDA 架构仍由 llama.cpp 的默认配置决定。
+容器同时安装 Node.js 和 npm，由源码构建并嵌入 llama-server 的 Web UI。
+
 ## 构建环境说明
 
 GitHub 托管 runner 尚无 `ubuntu-26.04` runner 标签，因此工作流在

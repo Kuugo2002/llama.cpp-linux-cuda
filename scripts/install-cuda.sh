@@ -12,7 +12,7 @@ esac
 
 apt-get update
 apt-get install -y --no-install-recommends \
-  ca-certificates cmake coreutils curl g++ git gzip ninja-build pkg-config tar xz-utils
+  ca-certificates cmake coreutils curl g++ git gzip ninja-build nodejs npm pkg-config tar xz-utils
 
 curl --fail --location --retry 5 \
   --output /tmp/cuda-keyring.deb \
