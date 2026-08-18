@@ -3,7 +3,6 @@ set -euo pipefail
 
 : "${CUDA_VERSION:?CUDA_VERSION must be set}"
 : "${LLAMA_REF:=master}"
-: "${CUDA_ARCHITECTURES:=75;80;86;89;90;100;120}"
 
 workspace="${GITHUB_WORKSPACE:-$(pwd)}"
 source_dir="${workspace}/llama.cpp"
@@ -20,7 +19,6 @@ llama_commit="$(git -C "${source_dir}" rev-parse --short=12 HEAD)"
 cmake -S "${source_dir}" -B "${build_dir}" -G Ninja \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX=/usr \
-  -DCMAKE_CUDA_ARCHITECTURES="${CUDA_ARCHITECTURES}" \
   -DGGML_CUDA=ON \
   -DLLAMA_CURL=OFF \
   -DLLAMA_BUILD_TESTS=OFF \
@@ -34,7 +32,6 @@ cp "${source_dir}/LICENSE" "${stage_dir}/share/llama.cpp/"
 {
   echo "llama.cpp commit: ${llama_commit}"
   echo "CUDA toolkit: ${CUDA_VERSION}"
-  echo "CUDA architectures: ${CUDA_ARCHITECTURES}"
   echo "Build image: ubuntu:26.04"
 } > "${stage_dir}/share/llama.cpp/BUILD-INFO.txt"
 

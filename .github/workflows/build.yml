@@ -6,71 +6,50 @@ on:
       cuda_version:
         description: CUDA version to build
         required: true
-        default: all
+        default: "13.2"
         type: choice
         options:
-          - all
-          - "12.9"
-          - "13.0"
           - "13.2"
+          - "13.0"
+          - "12.9"
       llama_ref:
         description: llama.cpp branch, tag, or commit
         required: true
         default: master
         type: string
-      cuda_architectures:
-        description: Semicolon-separated CUDA architectures
-        required: true
-        default: "75;80;86;89;90;100;120"
-        type: string
-  schedule:
-    - cron: "17 3 * * 1"
 
 permissions:
   contents: read
 
 concurrency:
-  group: llama-cpp-linux-cuda-${{ github.ref }}-${{ inputs.llama_ref || 'master' }}
+  group: llama-cpp-linux-cuda-${{ github.ref }}-${{ inputs.llama_ref }}-${{ inputs.cuda_version }}
   cancel-in-progress: false
 
 jobs:
   build:
-    name: CUDA ${{ matrix.cuda }}
+    name: CUDA ${{ inputs.cuda_version }}
     runs-on: ubuntu-24.04
     container:
       image: ubuntu:26.04
-    strategy:
-      fail-fast: false
-      matrix:
-        cuda: ["12.9", "13.0", "13.2"]
     env:
       DEBIAN_FRONTEND: noninteractive
-      LLAMA_REF: ${{ inputs.llama_ref || 'master' }}
-      CUDA_ARCHITECTURES: ${{ inputs.cuda_architectures || '75;80;86;89;90;100;120' }}
-      SHOULD_BUILD: ${{ github.event_name != 'workflow_dispatch' || inputs.cuda_version == 'all' || inputs.cuda_version == matrix.cuda }}
+      LLAMA_REF: ${{ inputs.llama_ref }}
+      CUDA_VERSION: ${{ inputs.cuda_version }}
 
     steps:
       - name: Check out packaging repository
-        if: env.SHOULD_BUILD == 'true'
         uses: actions/checkout@v4
 
       - name: Install dependencies and CUDA toolkit
-        if: env.SHOULD_BUILD == 'true'
-        env:
-          CUDA_VERSION: ${{ matrix.cuda }}
         run: bash scripts/install-cuda.sh
 
       - name: Build and package llama.cpp
-        if: env.SHOULD_BUILD == 'true'
-        env:
-          CUDA_VERSION: ${{ matrix.cuda }}
         run: bash scripts/build.sh
 
       - name: Upload package
-        if: env.SHOULD_BUILD == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: llama-cpp-linux-x86_64-cuda-${{ matrix.cuda }}
+          name: llama-cpp-linux-x86_64-cuda-${{ inputs.cuda_version }}
           path: dist/*
           if-no-files-found: error
           compression-level: 0
