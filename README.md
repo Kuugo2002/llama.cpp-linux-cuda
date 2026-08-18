@@ -20,13 +20,13 @@ commit。
 - `llama-cpp-<commit>-linux-x86_64-cuda-<version>.tar.gz`
 - 对应的 `.sha256` 校验文件
 
-压缩包按 `/usr` 目录布局组织，包含可执行文件、动态库、头文件、CMake/pkg-config
-元数据、许可证和构建信息。解压到任意目录后，如不安装到系统路径，需要把其中的
-`usr/lib` 加入 `LD_LIBRARY_PATH`。
+压缩包仅包含 llama.cpp 官方构建流程在 `build/bin` 中生成的可执行文件和动态库，
+不包含编译中间文件、头文件或 CMake/pkg-config 元数据。构建使用上游推荐命令：
 
-构建时关闭 `GGML_NATIVE`，避免无 GPU 的 GitHub Actions 容器尝试使用
-`-arch=native`；CUDA 架构仍由 llama.cpp 的默认配置决定。
-容器同时安装 Node.js 和 npm，由源码构建并嵌入 llama-server 的 Web UI。
+```bash
+cmake -B build -DGGML_CUDA=ON
+cmake --build build --config Release
+```
 
 ## 构建环境说明
 
