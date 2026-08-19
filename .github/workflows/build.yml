@@ -43,14 +43,14 @@ jobs:
       - name: Install dependencies and CUDA toolkit
         run: bash scripts/install-cuda.sh
 
-      - name: Build and package llama.cpp
+      - name: Build llama.cpp
         run: bash scripts/build.sh
 
-      - name: Upload package
+      - name: Upload binaries
         uses: actions/upload-artifact@v4
         with:
           name: llama-cpp-linux-x86_64-cuda-${{ inputs.cuda_version }}
-          path: dist/*
+          path: dist/
           if-no-files-found: error
           compression-level: 0
           retention-days: 30

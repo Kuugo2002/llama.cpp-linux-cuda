@@ -15,13 +15,10 @@
 **Run workflow**。每次运行选择一个 CUDA 版本；`llama_ref` 接受上游分支、tag 或
 commit。
 
-每个 CUDA 版本会生成一个独立的 Actions artifact，内含：
-
-- `llama-cpp-<commit>-linux-x86_64-cuda-<version>.tar.gz`
-- 对应的 `.sha256` 校验文件
-
-压缩包仅包含 llama.cpp 官方构建流程在 `build/bin` 中生成的可执行文件和动态库，
-不包含编译中间文件、头文件或 CMake/pkg-config 元数据。构建使用上游推荐命令：
+每个 CUDA 版本会生成一个独立的 Actions artifact。下载得到的 ZIP 中直接包含
+llama.cpp 官方构建流程在 `build/bin` 中生成的可执行文件和动态库，不再嵌套
+tar.gz，也不生成 SHA256 校验文件。artifact 不包含编译中间文件、头文件或
+CMake/pkg-config 元数据。构建使用上游推荐命令：
 
 ```bash
 cmake -B build -DGGML_CUDA=ON
