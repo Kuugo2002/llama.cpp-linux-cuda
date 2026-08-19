@@ -8,6 +8,7 @@ workspace="${GITHUB_WORKSPACE:-$(pwd)}"
 source_dir="${workspace}/llama.cpp"
 build_dir="${source_dir}/build"
 dist_dir="${workspace}/dist"
+build_parallelism="$(nproc)"
 
 git init "${source_dir}"
 git -C "${source_dir}" remote add origin https://github.com/ggml-org/llama.cpp.git
@@ -16,8 +17,8 @@ git -C "${source_dir}" checkout --detach FETCH_HEAD
 
 (
   cd "${source_dir}"
-  cmake -B build -DGGML_CUDA=ON
-  cmake --build build --config Release
+  cmake -B build -DGGML_CUDA=ON -DGGML_NATIVE=OFF
+  cmake --build build --config Release --parallel "${build_parallelism}"
 )
 
 if [[ ! -d "${build_dir}/bin" ]]; then

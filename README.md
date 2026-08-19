@@ -21,8 +21,8 @@ tar.gz，也不生成 SHA256 校验文件。artifact 不包含编译中间文件
 CMake/pkg-config 元数据。构建使用上游推荐命令：
 
 ```bash
-cmake -B build -DGGML_CUDA=ON
-cmake --build build --config Release
+cmake -B build -DGGML_CUDA=ON -DGGML_NATIVE=OFF
+cmake --build build --config Release --parallel "$(nproc)"
 ```
 
 ## 构建环境说明
