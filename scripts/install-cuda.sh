@@ -10,6 +10,31 @@ case "${CUDA_VERSION}" in
   *) echo "Unsupported CUDA version: ${CUDA_VERSION}" >&2; exit 2 ;;
 esac
 
+patch_cuda_glibc_math_declarations() {
+  local header="${cuda_home}/targets/x86_64-linux/include/crt/math_functions.h"
+
+  if [[ ! -f "${header}" ]]; then
+    echo "CUDA math_functions.h was not found at ${header}." >&2
+    exit 1
+  fi
+
+  sed -i -E \
+    -e 's#(extern __DEVICE_FUNCTIONS_DECL__ __device_builtin__ double[[:space:]]+cospi\(double x\))( noexcept \(true\))?;#\1 noexcept (true);#' \
+    -e 's#(extern __DEVICE_FUNCTIONS_DECL__ __device_builtin__ float[[:space:]]+cospif\(float x\))( noexcept \(true\))?;#\1 noexcept (true);#' \
+    -e 's#(extern __DEVICE_FUNCTIONS_DECL__ __device_builtin__ double[[:space:]]+sinpi\(double x\))( noexcept \(true\))?;#\1 noexcept (true);#' \
+    -e 's#(extern __DEVICE_FUNCTIONS_DECL__ __device_builtin__ float[[:space:]]+sinpif\(float x\))( noexcept \(true\))?;#\1 noexcept (true);#' \
+    -e 's#(extern __DEVICE_FUNCTIONS_DECL__ __device_builtin__ double[[:space:]]+rsqrt\(double x\))( noexcept \(true\))?;#\1 noexcept (true);#' \
+    -e 's#(extern __DEVICE_FUNCTIONS_DECL__ __device_builtin__ float[[:space:]]+rsqrtf\(float x\))( noexcept \(true\))?;#\1 noexcept (true);#' \
+    "${header}"
+
+  grep -Eq 'cospi\(double x\) noexcept \(true\);' "${header}"
+  grep -Eq 'cospif\(float x\) noexcept \(true\);' "${header}"
+  grep -Eq 'sinpi\(double x\) noexcept \(true\);' "${header}"
+  grep -Eq 'sinpif\(float x\) noexcept \(true\);' "${header}"
+  grep -Eq 'rsqrt\(double x\) noexcept \(true\);' "${header}"
+  grep -Eq 'rsqrtf\(float x\) noexcept \(true\);' "${header}"
+}
+
 apt-get update
 apt-get install -y --no-install-recommends \
   ca-certificates cmake coreutils curl g++ git gzip ninja-build nodejs npm pkg-config tar xz-utils
@@ -34,6 +59,10 @@ if [[ ! -x "${nvcc_path}" ]]; then
     exit 1
   fi
   cuda_home="${nvcc_path%/bin/nvcc}"
+fi
+
+if [[ "${CUDA_VERSION}" == "12.9" ]]; then
+  patch_cuda_glibc_math_declarations
 fi
 
 export CUDA_HOME="${cuda_home}"
